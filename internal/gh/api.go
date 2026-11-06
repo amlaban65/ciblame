@@ -212,6 +212,25 @@ func ParseRunURL(raw string) (owner, name string, id int64, err error) {
 	return parts[0], parts[1], id, nil
 }
 
+// ParsePullURL extracts owner, repo and pull number from a pull request URL
+// such as https://github.com/acme/web/pull/4149 (trailing path is ignored).
+func ParsePullURL(raw string) (owner, name string, number int, err error) {
+	u, err := url.Parse(raw)
+	if err != nil {
+		return "", "", 0, err
+	}
+	parts := splitPath(u.Path)
+	// owner / repo / pull / N [/ ...]
+	if len(parts) < 4 || parts[2] != "pull" {
+		return "", "", 0, fmt.Errorf("not a pull request URL: %s", raw)
+	}
+	number, err = strconv.Atoi(parts[3])
+	if err != nil || number <= 0 {
+		return "", "", 0, fmt.Errorf("not a pull request URL: %s", raw)
+	}
+	return parts[0], parts[1], number, nil
+}
+
 func splitPath(p string) []string {
 	var out []string
 	start := -1
