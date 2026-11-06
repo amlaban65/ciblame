@@ -88,8 +88,8 @@ func TestAgentsAndVersionAndWhy(t *testing.T) {
 	if code != 0 || !strings.Contains(out, "Attributed to") || !strings.Contains(out, "Evidence") {
 		t.Fatalf("why --demo: %d %s %s", code, out, errOut)
 	}
-	if _, _, code := runCLI(t, "why", "https://github.com/acme/web/pull/1"); code != 2 {
-		t.Fatalf("why with a non-run URL should be a usage error, got %d", code)
+	if _, _, code := runCLI(t, "why", "https://example.com/not-a-github-url"); code != 2 {
+		t.Fatalf("why with a non-GitHub URL should be a usage error, got %d", code)
 	}
 }
 
@@ -192,6 +192,16 @@ func TestEndToEndAgainstFakeAPI(t *testing.T) {
 	out, errOut, code = runCLI(t, "why", "--api-url", srv.URL, "https://github.com/acme/web/actions/runs/101")
 	if code != 0 || !strings.Contains(out, "GitHub Copilot") || !strings.Contains(out, "#7 by Copilot (closed)") {
 		t.Fatalf("why: %d\n%s\n%s", code, out, errOut)
+	}
+
+	out, errOut, code = runCLI(t, "why", "--api-url", srv.URL, "https://github.com/acme/web/pull/7")
+	if code != 0 {
+		t.Fatalf("why pull: %d\n%s\n%s", code, out, errOut)
+	}
+	for _, w := range []string{"Pull request #7", "Attributed to", "GitHub Copilot", "Runs", "total ("} {
+		if !strings.Contains(out, w) {
+			t.Fatalf("why pull missing %q:\n%s", w, out)
+		}
 	}
 }
 

@@ -292,3 +292,15 @@ func TestNextLink(t *testing.T) {
 		t.Fatal("expected no next link")
 	}
 }
+
+func TestParsePullURL(t *testing.T) {
+	o, n, num, err := ParsePullURL("https://github.com/acme/web/pull/4149/files")
+	if err != nil || o != "acme" || n != "web" || num != 4149 {
+		t.Fatalf("ParsePullURL: %q %q %d %v", o, n, num, err)
+	}
+	for _, bad := range []string{"https://github.com/acme/web", "https://github.com/acme/web/pull/x", "https://github.com/acme/web/actions/runs/1"} {
+		if _, _, _, err := ParsePullURL(bad); err == nil {
+			t.Fatalf("ParsePullURL(%q) should fail", bad)
+		}
+	}
+}

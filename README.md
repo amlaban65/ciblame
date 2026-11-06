@@ -63,6 +63,7 @@ ciblame acme/web --by workflow                       # which workflows burn the 
 ciblame acme/web --format markdown >> "$GITHUB_STEP_SUMMARY"
 ciblame acme/web --format csv --records > runs.csv   # one row per run, for your own analysis
 ciblame why https://github.com/acme/web/actions/runs/123456789
+ciblame why https://github.com/acme/web/pull/4149
 ```
 
 ## What you get
@@ -95,7 +96,7 @@ Each run is attributed using the strongest signal available, in this order:
 
 Steps 4–6 catch agents that work *through a person's account*; that person is recorded as the agent's operator (shown by `ciblame why` and in `--records` output). Runs are linked to their pull request even when GitHub leaves the run's PR list empty (fork PRs, merge queues, `refs/pull/N/head` dynamic runs), so CI on an agent's PR counts against the agent.
 
-Not sure about a run? `ciblame why <run-url>` prints the evidence:
+Not sure about a run? `ciblame why <run-url>` prints the evidence. Prefer a pull request? `ciblame why <pull-url>` attributes the PR once and lists every run on its head branch with minutes and estimated cost:
 
 ```text
 $ ciblame why --demo
